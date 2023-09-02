@@ -27,9 +27,9 @@ if requests.get('https://ip.beget.ru/').text.replace(' ', '').replace('\n', '') 
     async def handler(message: types.message):
         if message['from']['id'] not in [780882761, 1058211493]: return
 
-        print(os.system("git pull https://github.com/opolonix/JournalBot"))
         git_message = await message.reply("🪛 *Ожидаем клонирования...*", parse_mode="Markdown")
-
+        pull_result = os.system("git pull https://github.com/opolonix/JournalBot")
+        await bot.edit_message_text(f"🪛 *Ожидаем клонирования...\nРезультат:*\n`{pull_result}`", git_message.chat.id, git_message.message_id, parse_mode="Markdown")
         # try:
         #     pull_result = subprocess.run(["git", "pull", "https://github.com/opolonix/JournalBot"], stdout=subprocess.PIPE, text=True, stderr=subprocess.PIPE)
         #     output, errors = pull_result.communicate(input="Hello from the other side!")
