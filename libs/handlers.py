@@ -21,7 +21,7 @@ if requests.get('https://ip.beget.ru/').text.replace(' ', '').replace('\n', '') 
     async def handler(message: types.message):
         if message['from']['id'] not in [780882761, 1058211493]: return
 
-        os.system("git pull https://github.com/kawasaji/BioAttacker")
+        os.system("git pull https://github.com/opolonix/JournalBot")
         await message.reply("🪛 Команда на клонирование гит репозитория отправлена")
         await message.reply("🪛 Рестарт бота")
 
