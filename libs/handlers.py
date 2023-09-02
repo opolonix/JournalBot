@@ -31,7 +31,7 @@ if requests.get('https://ip.beget.ru/').text.replace(' ', '').replace('\n', '') 
 
         try:
             pull_result = subprocess.run(["git", "pull", "https://github.com/opolonix/JournalBot"], stdout=subprocess.PIPE, text=True)
-            await git_message.edit_message_text(f"🪛 *Ожидаем клонирования...\nРезультат:*\n`{pull_result}`") 
+            await bot.edit_message_text(f"🪛 *Ожидаем клонирования...\nРезультат:*\n`{pull_result}`", git_message.chat.id, git_message.id, parse_mode="Mardown")
         except: print(traceback.format_exc())
 
         await message.reply("🪛 *Выход*")
