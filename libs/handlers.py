@@ -28,6 +28,7 @@ if requests.get('https://ip.beget.ru/').text.replace(' ', '').replace('\n', '') 
 
         # os.system("git pull https://github.com/opolonix/JournalBot")
         git_message = await message.reply("🪛 *Ожидаем клонирования...*")
+        print(git_message)
 
         try:
             pull_result = subprocess.run(["git", "pull", "https://github.com/opolonix/JournalBot"], stdout=subprocess.PIPE, text=True)
