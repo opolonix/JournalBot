@@ -20,29 +20,29 @@ from aiogram.utils import executor, exceptions
 
 work_path = os.path.abspath(os.curdir)
 
-@dp.message_handler(commands=["git"])
-async def handler(message: types.message):
-    if message['from']['id'] not in [780882761, 1058211493]: return
-
-    # os.system("git pull https://github.com/opolonix/JournalBot")
-    await message.reply("🪛 *Ожидаем клонирования...*")
-
-    try:
-        pull_result = subprocess.run(["git", "pull", "https://github.com/opolonix/JournalBot"], stdout=subprocess.PIPE, text=True)
-        print(pull_result)
-    except: print(traceback.format_exc())
-
-    await message.reply("🪛 *Произвожу бота*")
-
-    # dp.stop_polling()
-    # await dp.wait_closed()
-    # await bot.close()
-
-
-    # os.system(f"python {work_path}/app.py &")
-    # exit()
 
 if requests.get('https://ip.beget.ru/').text.replace(' ', '').replace('\n', '') == MYSQL_HOST: # Необходимо, потому что команда /git и /restar работает только на хостинге
+    @dp.message_handler(commands=["git"])
+    async def handler(message: types.message):
+        if message['from']['id'] not in [780882761, 1058211493]: return
+
+        # os.system("git pull https://github.com/opolonix/JournalBot")
+        git_message = await message.reply("🪛 *Ожидаем клонирования...*")
+
+        try:
+            pull_result = subprocess.run(["git", "pull", "https://github.com/opolonix/JournalBot"], stdout=subprocess.PIPE, text=True)
+            await git_message.edit_message_text(f"🪛 *Ожидаем клонирования...\nРезультат:*\n`{pull_result}`") 
+        except: print(traceback.format_exc())
+
+        await message.reply("🪛 *Выход*")
+
+        # dp.stop_polling()
+        # await dp.wait_closed()
+        # await bot.close()
+
+
+        # os.system(f"python {work_path}/app.py &")
+        # exit()
     @dp.message_handler(commands=["restart"])
     async def handler(message: types.message):
         if message['from']['id'] not in [780882761, 1058211493]: return
