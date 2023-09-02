@@ -79,3 +79,7 @@ async def handler(message: types.message):
         result = time_table(datetime.date.today())
         await message.reply(result, parse_mode = "Markdown")
 
+    if message.text.lower().startswith("+пара "):
+        text = message.text[6::]
+        print(text)
+        await message.reply(text, parse_mode = "Markdown")
