@@ -6,6 +6,7 @@ import random
 import datetime
 import subprocess
 import traceback
+import sys
 
 from zoneinfo import ZoneInfo
 
@@ -31,7 +32,7 @@ if requests.get('https://ip.beget.ru/').text.replace(' ', '').replace('\n', '') 
 
         try:
             pull_result = subprocess.run(["git", "pull", "https://github.com/opolonix/JournalBot"], stdout=subprocess.PIPE, text=True)
-            print(pull_result)
+            pull_result = str(pull_result).replace("\\n", "\n")
             await bot.edit_message_text(f"🪛 *Ожидаем клонирования...\nРезультат:*\n`{pull_result}`", git_message.chat.id, git_message.message_id, parse_mode="Markdown")
         except: print(traceback.format_exc())
 
@@ -43,7 +44,7 @@ if requests.get('https://ip.beget.ru/').text.replace(' ', '').replace('\n', '') 
 
 
         os.system(f"python {work_path}/app.py &")
-        exit()
+        sys.exit()
     @dp.message_handler(commands=["restart"])
     async def handler(message: types.message):
         if message['from']['id'] not in [780882761, 1058211493]: return
@@ -56,7 +57,7 @@ if requests.get('https://ip.beget.ru/').text.replace(' ', '').replace('\n', '') 
 
 
         os.system(f"python {work_path}/app.py &")
-        exit()
+        sys.exit()
 
 @dp.message_handler(commands=["exit"])
 async def handler(message: types.message):
