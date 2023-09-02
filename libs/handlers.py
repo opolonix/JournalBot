@@ -83,7 +83,7 @@ async def handler(message: types.message):
 async def handler(message: types.message):
     if message.text.lower() == "расписание":
         date = datetime.datetime.now()
-        result = time_table(date)
+        result, date = time_table(date, next=True)
 
         next_date = date + datetime.timedelta(days=1)
         pre_date = date - datetime.timedelta(days=1)
@@ -91,7 +91,7 @@ async def handler(message: types.message):
         inline_add = InlineKeyboardMarkup(row_width=3).add(
             InlineKeyboardButton('назад', callback_data=f"edit|{pre_date.strftime('%d.%m.%Y')}"),
             InlineKeyboardButton('обн', callback_data=f"edit|{date.strftime('%d.%m.%Y')}"),
-            InlineKeyboardButton('вперед', callback_data=f"edit|{next_date.strftime('%d.%m.%Y')}"),
+            InlineKeyboardButton('вперед', callback_data=f"edit|{next_date.strftime('%d.%m.%Y')}|n"),
             InlineKeyboardButton('домашняя работа', callback_data=f"home|{date.strftime('%d.%m.%Y')}"),
         )
         await message.reply(result, parse_mode = "Markdown", reply_markup=inline_add)
@@ -103,8 +103,6 @@ async def handler(message: types.message):
             split_item = i.strip().split(' ')
             data[split_item[0]] = ' '.join(split_item[1:])
 
-        print(data)
-
         await message.reply(escape_markdown(text), parse_mode = "Markdown")
 
 @dp.callback_query_handler()
@@ -112,19 +110,18 @@ async def callback_query(call: types.CallbackQuery):
     if call.data.split("|")[0] == "edit":
 
         date = datetime.datetime.strptime(call.data.split("|")[1], '%d.%m.%Y')
-        result = time_table(date)
+        result, date = time_table(date, next=len(call.data.split("|")) == 3 and call.data.split("|")[2] == 'n')
 
         next_date = date + datetime.timedelta(days=1)
         pre_date = date - datetime.timedelta(days=1)
 
         inline_add = InlineKeyboardMarkup(row_width=3).add(
-            InlineKeyboardButton('назад', callback_data=f"edit|{pre_date.strftime('%d.%m.%Y')}"),
+            InlineKeyboardButton('назад', callback_data=f"edit|{pre_date.strftime('%d.%m.%Y')}|p"),
             InlineKeyboardButton('обн', callback_data=f"edit|{date.strftime('%d.%m.%Y')}"),
-            InlineKeyboardButton('вперед', callback_data=f"edit|{next_date.strftime('%d.%m.%Y')}"),
+            InlineKeyboardButton('вперед', callback_data=f"edit|{next_date.strftime('%d.%m.%Y')}|n"),
             InlineKeyboardButton('домашняя работа', callback_data=f"home|{date.strftime('%d.%m.%Y')}"),
         )
-        try:
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=result, parse_mode = "Markdown", reply_markup=inline_add)
+        try: await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=result, parse_mode = "Markdown", reply_markup=inline_add)
         except exceptions.MessageNotModified: await call.answer()
     if call.data.split("|")[0] == "home":
         await call.answer()
