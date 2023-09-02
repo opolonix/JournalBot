@@ -124,4 +124,6 @@ async def callback_query(call: types.CallbackQuery):
         try: await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=result, parse_mode = "Markdown", reply_markup=inline_add)
         except exceptions.MessageNotModified: await call.answer()
     if call.data.split("|")[0] == "home":
+        date = datetime.datetime.strptime(call.data.split("|")[1], '%d.%m.%Y')
+        query("")
         await call.answer()
