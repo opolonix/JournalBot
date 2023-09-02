@@ -82,7 +82,7 @@ async def handler(message: types.message):
 async def handler(message: types.message):
     if message.text.lower() == "расписание":
         date = datetime.date.today()
-        result = time_table(datetime.date.today())
+        result = time_table(datetime.datetime.today())
 
         next_date = date + datetime.timedelta(days=1)
         pre_date = date - datetime.timedelta(days=1)
