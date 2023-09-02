@@ -4,6 +4,7 @@ import asyncio
 import requests
 import random
 import datetime
+from zoneinfo import ZoneInfo
 
 from app import dp, bot, query, week, time_table, escape_markdown
 from config import MYSQL_HOST
@@ -81,8 +82,8 @@ async def handler(message: types.message):
 @dp.message_handler(content_types=['text']) 
 async def handler(message: types.message):
     if message.text.lower() == "расписание":
-        date = datetime.date.today()
-        result = time_table(datetime.datetime.today())
+        date = datetime.datetime.now()
+        result = time_table(date)
 
         next_date = date + datetime.timedelta(days=1)
         pre_date = date - datetime.timedelta(days=1)
