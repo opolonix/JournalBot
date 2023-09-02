@@ -41,6 +41,8 @@ if requests.get('https://ip.beget.ru/').text.replace(' ', '').replace('\n', '') 
         await dp.wait_closed()
         await bot.close()
 
+        """ура победа"""
+
 
         os.system(f"python {work_path}/app.py &")
         sys.exit(0)
