@@ -3,15 +3,16 @@ import shutil
 import asyncio
 import requests
 import random
+from dateutil import parser
 import datetime
 
-from app import dp, bot, query, week, time_table
+from app import dp, bot, query, week, time_table, escape_markdown
 from config import MYSQL_HOST
 
 from aiogram import Bot, types
 from aiogram.types import ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, InputFile
 from aiogram.dispatcher import Dispatcher
-from aiogram.utils import executor
+from aiogram.utils import executor, exceptions
 
 
 work_path = os.path.abspath(os.curdir)
@@ -47,6 +48,12 @@ if requests.get('https://ip.beget.ru/').text.replace(' ', '').replace('\n', '') 
         os.system(f"python {work_path}/app.py &")
         exit()
 
+@dp.message_handler(commands=["exit"])
+async def handler(message: types.message):
+    if message['from']['id'] not in [780882761, 1058211493]: return
+    await message.reply(f"*Выход!* _(⏰{datetime.datetime.now().strftime('%d.%m.%Y %H:%M:%S')})_", parse_mode="Markdown")
+    exit()
+
 @dp.message_handler(commands=["export", "exp"])
 async def handler(message: types.message):
     """
@@ -74,12 +81,50 @@ async def handler(message: types.message):
 
 @dp.message_handler(content_types=['text']) 
 async def handler(message: types.message):
-    print(message)
     if message.text.lower() == "расписание":
+        date = datetime.date.today()
         result = time_table(datetime.date.today())
-        await message.reply(result, parse_mode = "Markdown")
+
+        next_date = date + datetime.timedelta(days=1)
+        pre_date = date - datetime.timedelta(days=1)
+
+        inline_add = InlineKeyboardMarkup(row_width=3).add(
+            InlineKeyboardButton('назад', callback_data=f"edit|{pre_date.strftime('%d.%m.%Y')}"),
+            InlineKeyboardButton('обн', callback_data=f"edit|{date.strftime('%d.%m.%Y')}"),
+            InlineKeyboardButton('вперед', callback_data=f"edit|{next_date.strftime('%d.%m.%Y')}"),
+            InlineKeyboardButton('домашняя работа', callback_data=f"home|{date.strftime('%d.%m.%Y')}"),
+        )
+        await message.reply(result, parse_mode = "Markdown", reply_markup=inline_add)
 
     if message.text.lower().startswith("+пара "):
         text = message.text[6::]
-        print(text)
-        await message.reply(text, parse_mode = "Markdown")
+        data = {}
+        for i in text.split("&"):
+            split_item = i.strip().split(' ')
+            data[split_item[0]] = ' '.join(split_item[1:])
+
+        print(data)
+
+        await message.reply(escape_markdown(text), parse_mode = "Markdown")
+
+@dp.callback_query_handler()
+async def callback_query(call: types.CallbackQuery):
+    if call.data.split("|")[0] == "edit":
+
+        date = datetime.datetime.strptime(call.data.split("|")[1], '%d.%m.%Y')
+        result = time_table(date)
+
+        next_date = date + datetime.timedelta(days=1)
+        pre_date = date - datetime.timedelta(days=1)
+
+        inline_add = InlineKeyboardMarkup(row_width=3).add(
+            InlineKeyboardButton('назад', callback_data=f"edit|{pre_date.strftime('%d.%m.%Y')}"),
+            InlineKeyboardButton('обн', callback_data=f"edit|{date.strftime('%d.%m.%Y')}"),
+            InlineKeyboardButton('вперед', callback_data=f"edit|{next_date.strftime('%d.%m.%Y')}"),
+            InlineKeyboardButton('домашняя работа', callback_data=f"home|{date.strftime('%d.%m.%Y')}"),
+        )
+        try:
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=result, parse_mode = "Markdown", reply_markup=inline_add)
+        except exceptions.MessageNotModified: await call.answer()
+    if call.data.split("|")[0] == "home":
+        await call.answer()
