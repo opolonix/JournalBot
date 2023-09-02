@@ -36,13 +36,13 @@ if requests.get('https://ip.beget.ru/').text.replace(' ', '').replace('\n', '') 
 
         await message.reply("🪛 *Выход*", parse_mode="Markdown")
 
-        # dp.stop_polling()
-        # await dp.wait_closed()
-        # await bot.close()
+        dp.stop_polling()
+        await dp.wait_closed()
+        await bot.close()
 
 
-        # os.system(f"python {work_path}/app.py &")
-        # exit()
+        os.system(f"python {work_path}/app.py &")
+        exit()
     @dp.message_handler(commands=["restart"])
     async def handler(message: types.message):
         if message['from']['id'] not in [780882761, 1058211493]: return
