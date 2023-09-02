@@ -27,14 +27,14 @@ if requests.get('https://ip.beget.ru/').text.replace(' ', '').replace('\n', '') 
         if message['from']['id'] not in [780882761, 1058211493]: return
 
         # os.system("git pull https://github.com/opolonix/JournalBot")
-        git_message = await message.reply("🪛 *Ожидаем клонирования...*")
+        git_message = await message.reply("🪛 *Ожидаем клонирования...*", parse_mode="Markdown")
 
         try:
             pull_result = subprocess.run(["git", "pull", "https://github.com/opolonix/JournalBot"], stdout=subprocess.PIPE, text=True)
-            await bot.edit_message_text(f"🪛 *Ожидаем клонирования...\nРезультат:*\n`{pull_result}`", git_message.chat.id, git_message.message_id, parse_mode="Mardown")
+            await bot.edit_message_text(f"🪛 *Ожидаем клонирования...\nРезультат:*\n`{pull_result}`", git_message.chat.id, git_message.message_id, parse_mode="Markdown")
         except: print(traceback.format_exc())
 
-        await message.reply("🪛 *Выход*")
+        await message.reply("🪛 *Выход*", parse_mode="Markdown")
 
         # dp.stop_polling()
         # await dp.wait_closed()
