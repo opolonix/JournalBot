@@ -31,9 +31,10 @@ if requests.get('https://ip.beget.ru/').text.replace(' ', '').replace('\n', '') 
         git_message = await message.reply("🪛 *Ожидаем клонирования...*", parse_mode="Markdown")
 
         try:
-            pull_result = subprocess.run(["git", "pull", "https://github.com/opolonix/JournalBot"], stdout=subprocess.PIPE, text=True)
-            # pull_result = str(pull_result).replace("\\n", "\n")
-            await bot.edit_message_text(f"🪛 *Ожидаем клонирования...\nРезультат:*\n`{pull_result}`", git_message.chat.id, git_message.message_id, parse_mode="Markdown")
+            pull_result = subprocess.run(["git", "pull", "https://github.com/opolonix/JournalBot"], stdout=subprocess.PIPE, text=True, stderr=subprocess.PIPE)
+            output, errors = pull_result.communicate(input="Hello from the other side!")
+            pull_result.wait()
+            await bot.edit_message_text(f"🪛 *Ожидаем клонирования...\nРезультат:*\n`{output}`", git_message.chat.id, git_message.message_id, parse_mode="Markdown")
         except: print(traceback.format_exc())
 
         await message.reply("🪛 *Выход*", parse_mode="Markdown")
@@ -44,7 +45,7 @@ if requests.get('https://ip.beget.ru/').text.replace(' ', '').replace('\n', '') 
 
 
         os.system(f"python {work_path}/app.py &")
-        sys.exit()
+        sys.exit(0)
     @dp.message_handler(commands=["restart"])
     async def handler(message: types.message):
         if message['from']['id'] not in [780882761, 1058211493]: return
@@ -57,7 +58,7 @@ if requests.get('https://ip.beget.ru/').text.replace(' ', '').replace('\n', '') 
 
 
         os.system(f"python {work_path}/app.py &")
-        sys.exit()
+        sys.exit(0)
 
 @dp.message_handler(commands=["exit"])
 async def handler(message: types.message):
