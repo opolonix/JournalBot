@@ -7,6 +7,7 @@ import os
 import sys
 import asyncio
 import time
+import subprocess
 import re
 
 from config import BOT_TOKEN, OWNER_ID
