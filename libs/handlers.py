@@ -3,7 +3,6 @@ import shutil
 import asyncio
 import requests
 import random
-from dateutil import parser
 import datetime
 
 from app import dp, bot, query, week, time_table, escape_markdown
