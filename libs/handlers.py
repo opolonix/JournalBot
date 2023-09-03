@@ -93,7 +93,7 @@ async def handler(message: types.message):
 
 @dp.message_handler(content_types=['text']) 
 async def handler(message: types.message):
-    if message.text.lower() == "расписание":
+    if message.text.lower() in ["расписание", "р", "/timetable@msg_72997_bot"]:
         date = datetime.datetime.now()
         result, date = time_table(date, next=True)
 
