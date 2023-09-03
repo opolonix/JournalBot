@@ -26,12 +26,12 @@ def time_table(date, next):
         result += ' ' + date.strftime('%d.%m.%Y')
         even = date.isocalendar()[1] % 2 == 1
         timestamp = int(date.timestamp()) - 10800
-        red = even
-        blue = not even
+        red = not even
+        blue = even
         free = date.weekday() >= 5
         skip_free = True
 
-        if even: result += " 🔵"
+        if not even: result += " 🔵"
         else: result += " 🔴"
         day = query(f"SELECT * FROM `{week[date.weekday()][0]}` ORDER BY `{week[date.weekday()][0]}`.`pos` ASC")
         for i in day:
