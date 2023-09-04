@@ -31,7 +31,7 @@ def time_table(date, next):
         free = date.weekday() >= 5
         skip_free = True
 
-        if not even: result += " 🔵"
+        if even: result += " 🔵"
         else: result += " 🔴"
         day = query(f"SELECT * FROM `{week[date.weekday()][0]}` ORDER BY `{week[date.weekday()][0]}`.`pos` ASC")
         for i in day:
