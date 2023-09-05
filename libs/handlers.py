@@ -35,12 +35,14 @@ if requests.get('https://ip.beget.ru/').text.replace(' ', '').replace('\n', '') 
         await bot.edit_message_text(f"🪛 *Ожидаем клонирования...\nРезультат:*\n`{output}`", git_message.chat.id, git_message.message_id, parse_mode="Markdown")
         if "Already up to date.\n" != output:
             await message.reply(f"*Выход!* _(⏰{datetime.datetime.now().strftime('%d.%m.%Y %H:%M:%S')})_", parse_mode="Markdown")
-
-            dp.stop_polling()
-            await dp.wait_closed()
-            await bot.close()
+            try:
+                dp.stop_polling()
+                await dp.wait_closed()
+                await bot.close()
+            except: pass
 
             os.system(f"python {work_path}/app.py &")
+            sys.exit(0)
         else: await message.reply(f"*Файлы не затронуты, перезагрузка не требуется!*", parse_mode="Markdown")
     @dp.message_handler(commands=["restart"])
     async def handler(message: types.message):
