@@ -14,7 +14,7 @@ from config import BOT_TOKEN, OWNER_ID
 
 from libs.mysql_connect import query
 from libs.handlers import *
-from libs.days_data import week
+from libs.days_data import week, timetableBtn
 from libs.time_table import time_table
 
 sys.path.append(os.path.abspath(os.curdir) + "/libs")
