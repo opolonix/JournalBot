@@ -10,7 +10,7 @@ import sys
 
 from zoneinfo import ZoneInfo
 
-from app import dp, bot, query, week, time_table, escape_markdown
+from app import dp, bot, query, week, time_table, escape_markdown, timetableBtn
 from config import MYSQL_HOST
 
 from aiogram import Bot, types
@@ -63,6 +63,10 @@ async def handler(message: types.message):
     if message['from']['id'] not in [780882761, 1058211493]: return
     await message.reply(f"*Выход!* _(⏰{datetime.datetime.now().strftime('%d.%m.%Y %H:%M:%S')})_", parse_mode="Markdown")
     exit(0)
+
+@dp.message_handler(commands=["start"])
+async def handler(message: types.message):
+    await message.reply("**Приветсвую! Это бот для контроля расписания и домашки!!**", parse_mode = "Markdown", reply_markup=timetableBtn)
 
 @dp.message_handler(commands=["export", "exp"])
 async def handler(message: types.message):
