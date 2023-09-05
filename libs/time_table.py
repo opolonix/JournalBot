@@ -3,13 +3,14 @@ from time import mktime
 from app import week, query, ZoneInfo
 import json
 
-def this_day(text):
+def check_day(text):
     return datetime.datetime.now().strftime('%d.%m.%Y') == text
 
 def time_table(date, next):
 
     free = date.weekday() >= 5
     skip_free = True
+    this_day = datetime.datetime.now().strftime('%d.%m.%Y') == date.strftime('%d.%m.%Y')
     result = None
 
     events = query(f"SELECT * FROM `events` WHERE `type` LIKE 'skip'")
@@ -19,6 +20,11 @@ def time_table(date, next):
             if next: date += datetime.timedelta(days=1)
             else: date -= datetime.timedelta(days=1)
             result, date = time_table(date, next)
+
+    if date.hour >= 16 and this_day:
+        date += datetime.timedelta(days=1)
+        result, date = time_table(date, next)
+
 
     if result == None:
         result = ""
