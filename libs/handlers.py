@@ -7,6 +7,8 @@ import datetime
 import subprocess
 import traceback
 import sys
+import string
+from ast import literal_eval
 
 from zoneinfo import ZoneInfo
 
@@ -21,6 +23,10 @@ from aiogram.utils import executor, exceptions
 
 work_path = os.path.abspath(os.curdir)
 
+class HMW:
+    def __init__(self) -> None:
+        self.wait_load_tasks = {}
+hmw = HMW()
 
 if requests.get('https://ip.beget.ru/').text.replace(' ', '').replace('\n', '') == MYSQL_HOST: # Необходимо, потому что команда /git и /restar работает только на хостинге
     @dp.message_handler(commands=["git"])
@@ -118,9 +124,94 @@ async def handler(message: types.message):
             data[split_item[0]] = ' '.join(split_item[1:])
 
         await message.reply(escape_markdown(text), parse_mode = "Markdown")
+    elif message.text.startswith("+") and not message.text.startswith("+ "):
+        text = message.text[2::].lower()
+        text = message.text[1].upper() + text
+
+        syns = {
+            "ПРАКТИКА":                             ["практика"],
+            "МДК":                                  ["мдк"],
+            "Классный час":                         ["классный час"],
+            "Элементы высшей математики":           ["вышмат", "высшая математика"],
+            "Компьютерные сети":                    ["кс", "компьютерные сети"],
+            "Деловой русский язык и культура речи": ["культура речи", "деловой русский и культура речи"],
+            "Деловой русский язык":                 ["деловой русский"],
+            "Английский":                           ["английский"],
+            "Физика":                               ["физика"],
+            "МДК 04.01":                            ["мдк 01"],
+            "Архитектура аппаратных средств":       ["апп. средства", "архитектура аппаратных средств", "апп средства"],
+            "Физкультура":                          ["физра", "физкультура", "физ ра"]
+        }
+
+        day = None
+
+        if message.reply_to_message and message.reply_to_message.from_user.id in [6636195294]:
+            day = message.reply_to_message.reply_markup.inline_keyboard[1][0]['callback_data'].split("|")[1]
+
+        task = None
+
+        subj = text.split(' ')[0] if len(text.split(' ')) != 1 else None
+        task = ' '.join(text.split(' ')[1::]) if len(text.split(' ')) != 1 else None
+        is_syn = False
+        for i in syns:
+            for j in syns[i]:
+                if text.lower().startswith(j + " "):
+                    task = text[len(j + " ")::]
+                    subj = i
+                    is_syn = True
+                    break
+        
+        
+
+        if subj != None and day != None and task != None:
+            key = ''.join(random.choice(string.ascii_lowercase) for i in range(6))
+            inline_hmw = InlineKeyboardMarkup(row_width=3).add(
+                InlineKeyboardButton('Загрузить дз', callback_data=f"add_home|{key}"),
+                InlineKeyboardButton('Отмена', callback_data=f"remove_home|{key}")
+            )
+            tasks = []
+            for i in query("SELECT * FROM `events` WHERE `type` LIKE 'home' ORDER BY `events`.`id` ASC"):
+                data = literal_eval(i['data'])
+                if data['date'] == day and data['subj_name'].lower() == subj.lower():
+                    tasks.append(data['task'])
+
+            text_tasks = '\n'.join(tasks)
+            new_task = ""
+            for i in task.split("\n"):
+                new_task += f"\n+>{i}"
+
+            hmw.wait_load_tasks[key] = {
+                "task": task,
+                "subj": subj,
+                "date": day
+            }
+
+            if is_syn or text_tasks != "": result = f"Хотите _добавить дз_ по предменту *{subj.lower()}* на _{day}_?\n\nТекст задания:\n{text_tasks}{new_task}"
+            else: result = f"Предмет не найден в синонимах, уверены, что ходите добавить дз для предмета *{subj.lower()}* на _{day}_?\n\nТекст задания:\n{text_tasks}{new_task}"
+            await message.reply(result, parse_mode = "Markdown", reply_markup=inline_hmw)
+        
+
 
 @dp.callback_query_handler()
 async def callback_query(call: types.CallbackQuery):
+    
+    if call.data.split("|")[0] == "add_home":
+        if call.data.split("|")[1] in hmw.wait_load_tasks:
+            data = hmw.wait_load_tasks[call.data.split("|")[1]]
+            task_data = f'{{"date": "{data["date"]}", "task": "{data["task"]}", "subj_name": "{data["subj"]}"}}'.replace('"', '\\"').replace("'", "\\'").replace("\n", "&%&")
+
+            query(f"INSERT INTO `events` (`id`, `type`, `date_from`, `date_until`, `data`) VALUES (NULL, 'home', NULL, NULL, '{task_data}')")
+            await call.answer("Дз загружено!")
+            inline_add = InlineKeyboardMarkup()
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Дз успешно обновлено!", parse_mode = "Markdown", reply_markup=inline_add)
+        else: await call.answer("Кнопка устарела!")
+    if call.data.split("|")[0] == "remove_home":
+        try: 
+            del hmw.wait_load_tasks[call.data.split("|")[1]]
+            await call.answer("Дз удалено!")
+        except: await call.answer("Кнопка устарела!")
+        inline_add = InlineKeyboardMarkup()
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=call.message.text, parse_mode = "Markdown", reply_markup=inline_add)
     if call.data.split("|")[0] == "edit":
 
         date = datetime.datetime.strptime(call.data.split("|")[1], '%d.%m.%Y')
@@ -139,5 +230,18 @@ async def callback_query(call: types.CallbackQuery):
         except exceptions.MessageNotModified: await call.answer()
     if call.data.split("|")[0] == "home":
         date = datetime.datetime.strptime(call.data.split("|")[1], '%d.%m.%Y')
-        query("")
-        await call.answer()
+        tasks = {}
+        for i in query("SELECT * FROM `events` WHERE `type` LIKE 'home' ORDER BY `events`.`id` ASC"):
+            data = literal_eval(i['data'])
+            if data['date'] == call.data.split("|")[1]:
+                if data['subj_name'].lower() in tasks: tasks[data['subj_name'].lower()] += '\n' + data['task'].replace("&%&", "\n")
+                else: tasks[data['subj_name'].lower()] = data['task'].replace("&%&", "\n")
+        result = f"Дз на {call.data.split('|')[1]}"
+        for i in tasks:
+            result += f"\n *{i[0].upper() + i.lower()[1::]}*\n"
+            result += tasks[i]
+        if len(tasks) != 0:
+            await call.answer()
+            await call.message.reply(result, parse_mode = "Markdown")
+        else:
+            await call.answer("Дз не найдено")
