@@ -145,7 +145,7 @@ async def handler(message: types.message):
 
         day = None
 
-        if message.reply_to_message and message.reply_to_message.from_user.id in [6636195294]:
+        if message.reply_to_message and message.reply_to_message.from_user.id in [6636195294, 5438548972]:
             day = message.reply_to_message.reply_markup.inline_keyboard[1][0]['callback_data'].split("|")[1]
 
         task = None
