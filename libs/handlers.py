@@ -107,7 +107,7 @@ async def handler(message: types.message):
 
         next_date = date + datetime.timedelta(days=1)
         pre_date = date - datetime.timedelta(days=1)
-        date = datetime.datetime.strptime(call.data.split("|")[1], '%d.%m.%Y')
+
         tasks = 0
         for i in query("SELECT * FROM `events` WHERE `type` LIKE 'home' ORDER BY `events`.`id` ASC"):
             data = literal_eval(i['data'])
