@@ -227,11 +227,17 @@ async def callback_query(call: types.CallbackQuery):
         next_date = date + datetime.timedelta(days=1)
         pre_date = date - datetime.timedelta(days=1)
 
+        tasks = 0
+        for i in query("SELECT * FROM `events` WHERE `type` LIKE 'home' ORDER BY `events`.`id` ASC"):
+
+            data = literal_eval(i['data'])
+            if data['date'] == date.strftime('%d.%m.%Y'): tasks += 1
+
         inline_add = InlineKeyboardMarkup(row_width=3).add(
-            InlineKeyboardButton('назад', callback_data=f"edit|{pre_date.strftime('%d.%m.%Y')}|p"),
+            InlineKeyboardButton('назад', callback_data=f"edit|{pre_date.strftime('%d.%m.%Y')}"),
             InlineKeyboardButton('обн', callback_data=f"edit|{date.strftime('%d.%m.%Y')}"),
             InlineKeyboardButton('вперед', callback_data=f"edit|{next_date.strftime('%d.%m.%Y')}|n"),
-            InlineKeyboardButton('домашняя работа', callback_data=f"home|{date.strftime('%d.%m.%Y')}"),
+            InlineKeyboardButton(f"домашняя работа{' ▫️' if tasks != 0 else ''}", callback_data=f"home|{date.strftime('%d.%m.%Y')}"),
         )
         try: await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=result, parse_mode = "Markdown", reply_markup=inline_add)
         except exceptions.MessageNotModified: await call.answer()
