@@ -110,7 +110,9 @@ async def handler(message: types.message):
 
         tasks = 0
         for i in query("SELECT * FROM `events` WHERE `type` LIKE 'home' ORDER BY `events`.`id` ASC"):
+           
             data = literal_eval(i['data'])
+            print(data['date'], date.strftime('%d.%m.%Y'), data['date'] == date.strftime('%d.%m.%Y'))
             if data['date'] == date.strftime('%d.%m.%Y'): tasks += 1
 
         inline_add = InlineKeyboardMarkup(row_width=3).add(
