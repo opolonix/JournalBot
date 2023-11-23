@@ -117,7 +117,7 @@ async def handler(message: types.message):
             InlineKeyboardButton('назад', callback_data=f"edit|{pre_date.strftime('%d.%m.%Y')}"),
             InlineKeyboardButton('обн', callback_data=f"edit|{date.strftime('%d.%m.%Y')}"),
             InlineKeyboardButton('вперед', callback_data=f"edit|{next_date.strftime('%d.%m.%Y')}|n"),
-            InlineKeyboardButton('домашняя работа{' ▫️' if tasks != 0 else ''}', callback_data=f"home|{date.strftime('%d.%m.%Y')}"),
+            InlineKeyboardButton(f'домашняя работа{' ▫️' if tasks != 0 else ''}', callback_data=f"home|{date.strftime('%d.%m.%Y')}"),
         )
         await message.reply(result, parse_mode = "Markdown", reply_markup=inline_add)
 
