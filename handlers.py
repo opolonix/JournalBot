@@ -225,7 +225,7 @@ async def handler(message: types.message):
             data[split_item[0]] = ' '.join(split_item[1:])
 
         await message.reply(escape_markdown(text), parse_mode = "Markdown")
-    elif message.text.startswith("+дз") and not message.text.startswith("+дз "):
+    elif message.text.startswith("+дз"):
         text = message.text[3::].lower()
 
         syns = {
@@ -258,7 +258,7 @@ async def handler(message: types.message):
         task = ' '.join(text.split('\n')[1::]) if len(text.split('\n')) != 1 else None
         if not task:
             task = ' '.join(text.split(' ')[1::]) if len(text.split(' ')) != 1 else None
-            
+
         is_syn = False
         for i in syns:
             for j in syns[i]:
