@@ -125,6 +125,7 @@ if requests.get('https://ip.beget.ru/').text.replace(' ', '').replace('\n', '') 
             os.system(f"python {work_path}/app.py &")
             sys.exit(0)
         else: await message.reply(f"*Файлы не затронуты, перезагрузка не требуется!*", parse_mode="Markdown")
+
     @dp.message_handler(commands=["restart"])
     async def handler(message: types.message):
         if message['from']['id'] not in [780882761, 1058211493]: return
@@ -224,9 +225,9 @@ async def handler(message: types.message):
             data[split_item[0]] = ' '.join(split_item[1:])
 
         await message.reply(escape_markdown(text), parse_mode = "Markdown")
-    elif message.text.startswith("+") and not message.text.startswith("+ "):
-        text = message.text[2::].lower()
-        text = message.text[1].upper() + text
+    elif message.text.startswith("+дз") and not message.text.startswith("+дз "):
+        text = message.text[4::].lower()
+        # text = message.text[1].upper() + text
 
         syns = {
             "ПРАКТИКА":                             ["практика"],
@@ -251,7 +252,10 @@ async def handler(message: types.message):
 
         task = None
 
-        subj = text.split(' ')[0] if len(text.split(' ')) != 1 else None
+        subj = text.split('\n')[0] if len(text.split('\n')) != 1 else None
+        if not subj:
+            subj = text.split(' ')[0] if len(text.split(' ')) != 1 else None
+
         task = ' '.join(text.split(' ')[1::]) if len(text.split(' ')) != 1 else None
         is_syn = False
         for i in syns:
