@@ -28,6 +28,56 @@ class HMW:
         self.wait_load_tasks = {}
 hmw = HMW()
 
+
+teacher = """<b>Учителя:</b>
+<blockquote>
+Дикаленко Игорь Андреевич - БОСС
+Гапонов Андрей Иванович - Вышмат
+Ермоленко Ростислав Александрович - Архитектура
+Иванов Алексей Викторович - Дискретная математика
+Китаев Артур Владимирович - ПМ.04 
+Ковалёва Надежда Сергеевна - Иностранный язык
+Когут Виктор Игоревич - Компьютерные сети
+Козлов Юрий Васильевич - Физкультура
+Лялечкина Зинаида Павловна - Психология
+Мельник Александр Геннадьевич - МДК 04.01, МДК 04.02
+Опацкая Алла Ивановна - История
+Томалак Марина Григорьевна - Физика
+Чернышенко Надежда Владимировна - Деловой русский язык, Философии
+</blockquote>
+"""
+
+student = """<b>Ученики:</b>
+<blockquote>
+Бобров Михаил Андреевич
+Боровик Даниил
+Быстров Виктор
+Верещагин Андрей
+Громов Дмитрий
+Дятлов Константин
+Житенко Артем Леонидович
+Заусаев Илья
+Клепиков Михаил
+Ковальчук Денис
+Король Тимофей
+Кузнецова Виолетта
+Мокеев Алексей
+Новиков Андрей Александрович
+Ольшанская Доменика
+Пестряков Максим Геевич
+Раенко Андрей
+Рулев Степан Сергеевич
+Сайдаметов Тимур
+Смелов Антон
+Старовойтов Олег
+Трухачев Артем Александрович
+Туранский Даниил Александрович
+Шилова Евгения
+</blockquote>
+"""
+
+
+
 if requests.get('https://ip.beget.ru/').text.replace(' ', '').replace('\n', '') == MYSQL_HOST: # Необходимо, потому что команда /git и /restar работает только на хостинге
     @dp.message_handler(commands=["git"])
     async def handler(message: types.message):
@@ -123,6 +173,19 @@ async def handler(message: types.message):
         )
         await message.reply(result, parse_mode = "Markdown", reply_markup=inline_add)
 
+    if message.text.lower().startswith("ученики"):
+        inline_add = InlineKeyboardMarkup(row_width=1).add(
+            InlineKeyboardButton('скрыть', callback_data=f"del")
+        )
+        await message.reply(student, parse_mode = "HTML", reply_markup=inline_add)
+
+    if message.text.lower().startswith("учителя"):
+        inline_add = InlineKeyboardMarkup(row_width=1).add(
+            InlineKeyboardButton('скрыть', callback_data=f"del")
+        )
+        await message.reply(teacher, parse_mode = "HTML", reply_markup=inline_add)
+        
+
     if message.text.lower().startswith("+пара "):
         text = message.text[6::]
         data = {}
@@ -147,9 +210,8 @@ async def handler(message: types.message):
             "Физика":                               ["физика"],
             "Архитектура аппаратных средств":       ["апп. средства", "архитектура аппаратных средств", "апп средства"],
             "Физкультура":                          ["физра", "физкультура", "физ ра"],
-            "История": ["история"],
-            "Дискретная математика":                          ["дискретная математика", "дискрет"],
-            "История": ["история"]
+            "История":                              ["история"],
+            "Дискретная математика":                ["дискретная математика", "дискрет"]
         }
 
         day = None
@@ -260,3 +322,6 @@ async def callback_query(call: types.CallbackQuery):
             await call.message.reply(result, parse_mode = "Markdown")
         else:
             await call.answer("Дз не найдено")
+
+    if call.data == "del":
+        await call.message.delete()
