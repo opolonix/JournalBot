@@ -9,12 +9,8 @@ week = [
     ["saturday",  "Суббота",     "Субботу"],
     ["sunday",    "Воскресенье", "Воскресенье"]
 ]
-# timetable = KeyboardButton('Расписание')
-# teachers = KeyboardButton('Учителя')
-# group = KeyboardButton('Группа')
-# timetableBtn = ReplyKeyboardMarkup(resize_keyboard=True)
-# timetableBtn.add(timetable).add(teachers, group)
-# position = ReplyKeyboardMarkup().row(timetable, teachers, group)
-
 timetable = KeyboardButton('Расписание')
-timetableBtn = ReplyKeyboardMarkup(resize_keyboard=True).row(timetable)
+teachers = KeyboardButton('Учителя')
+group = KeyboardButton('Группа')
+timetableBtn = ReplyKeyboardMarkup(resize_keyboard=True)
+timetableBtn.add(timetable).add(teachers, group)
